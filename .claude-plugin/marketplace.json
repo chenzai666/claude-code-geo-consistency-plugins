@@ -5,6 +5,15 @@
   },
   "plugins": [
     {
+      "name": "geo-consistency",
+      "source": "./geo-consistency",
+      "description": "Unified Claude Code proxy, egress IP, and runtime consistency checks for Windows and macOS.",
+      "version": "0.1.0",
+      "author": {
+        "name": "local"
+      }
+    },
+    {
       "name": "geo-consistency-windows",
       "source": "./geo-consistency-windows",
       "description": "Windows Claude Code proxy, egress IP, and runtime consistency checks for local proxies such as v2rayN.",

@@ -1,7 +1,8 @@
 # Claude Code 出口一致性插件
 
-这个目录里有两个 Claude Code 插件版本，用来让 Claude Code 的终端运行环境、代理配置和实际出口 IP 保持一致：
+这个目录里有三个 Claude Code 插件入口，用来让 Claude Code 的终端运行环境、代理配置和实际出口 IP 保持一致：
 
+- `geo-consistency`：统一版，优先推荐安装；命令会按当前系统自动调用 Windows 或 macOS 脚本。
 - `geo-consistency-windows`：Windows 版，默认面向 v2rayN / PowerShell / `127.0.0.1:10808`。
 - `geo-consistency-macos`：macOS 版，面向 zsh/bash、系统代理和本地代理端口检测。
 - `claude-desktop-geo-consistency`：Claude Desktop 版，打包为 `.mcpb` Desktop Extension。
@@ -23,7 +24,13 @@
 /plugin marketplace add chenzai666/claude-code-geo-consistency-plugins
 ```
 
-然后按系统安装对应插件：
+然后优先安装统一版插件：
+
+```text
+/plugin install geo-consistency@geo-consistency
+```
+
+如果你明确只想安装某个平台的单独入口，也可以按系统安装：
 
 ```text
 /plugin install geo-consistency-windows@geo-consistency
@@ -39,7 +46,15 @@
 /reload-plugins
 ```
 
-安装后，命令会按插件 manifest 名称命名：
+安装统一版后使用：
+
+```text
+/geo-consistency:geo-status
+/geo-consistency:geo-verify
+/geo-consistency:geo-fix
+```
+
+单独平台入口仍然保留，命令会按插件 manifest 名称命名：
 
 ```text
 /geo-consistency-windows:geo-status
@@ -55,7 +70,7 @@
 
 ## 默认值
 
-两个版本默认都使用：
+Claude Code 插件默认都使用：
 
 - 主机：`127.0.0.1`
 - HTTP 代理端口：`10808`
