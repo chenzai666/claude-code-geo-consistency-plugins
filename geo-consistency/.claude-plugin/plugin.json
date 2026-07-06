@@ -1,0 +1,15 @@
+{
+  "name": "geo-consistency",
+  "version": "0.1.0",
+  "description": "Unified Claude Code proxy, egress IP, and runtime consistency checks for Windows and macOS.",
+  "author": {
+    "name": "local"
+  },
+  "keywords": [
+    "claude-code",
+    "proxy",
+    "egress",
+    "windows",
+    "macos"
+  ]
+}
