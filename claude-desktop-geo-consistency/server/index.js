@@ -1,7 +1,6 @@
 import childProcess from "node:child_process";
 import net from "node:net";
 import os from "node:os";
-import readline from "node:readline";
 
 const DEFAULT_PROXY_HOST = process.env.GEO_PROXY_HOST || "127.0.0.1";
 const DEFAULT_HTTP_PORT = normalizePort(process.env.GEO_HTTP_PORT, 10808);
@@ -73,20 +72,93 @@ const tools = [
   }
 ];
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  terminal: false
+let inputBuffer = Buffer.alloc(0);
+let outputMode = "ndjson";
+
+process.stdin.on("data", (chunk) => {
+  inputBuffer = Buffer.concat([inputBuffer, chunk]);
+  drainInputBuffer();
 });
 
-rl.on("line", async (line) => {
-  if (!line.trim()) {
+process.stdin.resume();
+
+function drainInputBuffer() {
+  while (inputBuffer.length > 0) {
+    const framed = tryReadContentLengthMessage();
+    if (framed === null) {
+      return;
+    }
+
+    if (framed === undefined) {
+      const line = tryReadLineMessage();
+      if (line === null) {
+        return;
+      }
+      handleRawMessage(line, "ndjson");
+      continue;
+    }
+
+    handleRawMessage(framed, "framed");
+  }
+}
+
+function tryReadContentLengthMessage() {
+  const headerEnd = inputBuffer.indexOf(Buffer.from("\r\n\r\n"));
+  if (headerEnd === -1) {
+    if (looksLikeContentLengthHeader(inputBuffer)) {
+      return null;
+    }
+    return undefined;
+  }
+
+  const header = inputBuffer.slice(0, headerEnd).toString("ascii");
+  if (!/^Content-Length:/im.test(header)) {
+    return undefined;
+  }
+
+  const match = header.match(/Content-Length:\s*(\d+)/i);
+  if (!match) {
+    inputBuffer = inputBuffer.slice(headerEnd + 4);
+    return "";
+  }
+
+  const contentLength = Number(match[1]);
+  const bodyStart = headerEnd + 4;
+  const bodyEnd = bodyStart + contentLength;
+  if (inputBuffer.length < bodyEnd) {
+    return null;
+  }
+
+  const body = inputBuffer.slice(bodyStart, bodyEnd).toString("utf8");
+  inputBuffer = inputBuffer.slice(bodyEnd);
+  outputMode = "framed";
+  return body;
+}
+
+function tryReadLineMessage() {
+  const newline = inputBuffer.indexOf(0x0a);
+  if (newline === -1) {
+    return null;
+  }
+
+  const line = inputBuffer.slice(0, newline).toString("utf8").trim();
+  inputBuffer = inputBuffer.slice(newline + 1);
+  return line;
+}
+
+function looksLikeContentLengthHeader(buffer) {
+  const prefix = buffer.slice(0, Math.min(buffer.length, 32)).toString("ascii");
+  return /^Content-Length:/i.test(prefix);
+}
+
+async function handleRawMessage(raw, mode) {
+  if (!raw || !raw.trim()) {
     return;
   }
 
   let request;
   try {
-    request = JSON.parse(line);
+    request = JSON.parse(raw);
   } catch {
     return;
   }
@@ -94,19 +166,22 @@ rl.on("line", async (line) => {
   try {
     const response = await handleRequest(request);
     if (response) {
-      writeJson(response);
+      writeJson(response, mode);
     }
   } catch (error) {
-    writeJson({
-      jsonrpc: "2.0",
-      id: request.id ?? null,
-      error: {
-        code: -32603,
-        message: error?.message || String(error)
-      }
-    });
+    writeJson(
+      {
+        jsonrpc: "2.0",
+        id: request.id ?? null,
+        error: {
+          code: -32603,
+          message: error?.message || String(error)
+        }
+      },
+      mode
+    );
   }
-});
+}
 
 async function handleRequest(request) {
   const { id, method, params } = request;
@@ -122,7 +197,7 @@ async function handleRequest(request) {
         },
         serverInfo: {
           name: "claude-desktop-geo-consistency",
-          version: "0.1.0"
+          version: "0.1.1"
         }
       }
     };
@@ -604,6 +679,13 @@ function execFileSafe(command, args) {
   });
 }
 
-function writeJson(value) {
-  process.stdout.write(`${JSON.stringify(value)}\n`);
+function writeJson(value, mode = outputMode) {
+  const json = JSON.stringify(value);
+  if (mode === "framed") {
+    const byteLength = Buffer.byteLength(json, "utf8");
+    process.stdout.write(`Content-Length: ${byteLength}\r\n\r\n${json}`);
+    return;
+  }
+
+  process.stdout.write(`${json}\n`);
 }
