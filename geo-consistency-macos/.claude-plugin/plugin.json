@@ -1,0 +1,14 @@
+{
+  "name": "geo-consistency-macos",
+  "version": "0.1.0",
+  "description": "macOS Claude Code proxy, egress IP, and runtime consistency checks for local proxies.",
+  "author": {
+    "name": "local"
+  },
+  "keywords": [
+    "claude-code",
+    "proxy",
+    "egress",
+    "macos"
+  ]
+}

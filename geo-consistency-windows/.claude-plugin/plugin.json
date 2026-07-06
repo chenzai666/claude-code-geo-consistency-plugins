@@ -1,0 +1,15 @@
+{
+  "name": "geo-consistency-windows",
+  "version": "0.1.0",
+  "description": "Windows Claude Code proxy, egress IP, and runtime consistency checks for local proxies such as v2rayN.",
+  "author": {
+    "name": "local"
+  },
+  "keywords": [
+    "claude-code",
+    "proxy",
+    "v2rayN",
+    "egress",
+    "windows"
+  ]
+}
