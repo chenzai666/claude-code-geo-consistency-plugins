@@ -1,0 +1,26 @@
+{
+  "name": "geo-consistency",
+  "owner": {
+    "name": "chenzai666"
+  },
+  "plugins": [
+    {
+      "name": "geo-consistency-windows",
+      "source": "./geo-consistency-windows",
+      "description": "Windows Claude Code proxy, egress IP, and runtime consistency checks for local proxies such as v2rayN.",
+      "version": "0.1.0",
+      "author": {
+        "name": "local"
+      }
+    },
+    {
+      "name": "geo-consistency-macos",
+      "source": "./geo-consistency-macos",
+      "description": "macOS Claude Code proxy, egress IP, and runtime consistency checks for local proxies.",
+      "version": "0.1.0",
+      "author": {
+        "name": "local"
+      }
+    }
+  ]
+}

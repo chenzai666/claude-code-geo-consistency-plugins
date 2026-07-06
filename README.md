@@ -14,7 +14,27 @@
 
 ## 安装建议
 
-用 Claude Code 的插件安装流程安装对应系统的目录，或者把对应目录复制到你的 Claude Code 插件工作区。
+这个仓库已经带有 Claude Code marketplace 清单。先在 Claude Code 里添加 marketplace：
+
+```text
+/plugin marketplace add chenzai666/claude-code-geo-consistency-plugins
+```
+
+然后按系统安装对应插件：
+
+```text
+/plugin install geo-consistency-windows@geo-consistency
+```
+
+```text
+/plugin install geo-consistency-macos@geo-consistency
+```
+
+安装后建议执行：
+
+```text
+/reload-plugins
+```
 
 安装后，命令会按插件 manifest 名称命名：
 
