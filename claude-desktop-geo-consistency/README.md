@@ -37,6 +37,14 @@ dist/claude-desktop-geo-consistency.mcpb
 
 在 Claude Desktop 中打开该 `.mcpb` 文件安装。
 
+Windows AppX 版 Claude Desktop 有时不能直接双击 `.mcpb`，会出现“Windows 无法访问指定设备、路径或文件”。这是文件关联指向 `WindowsApps` 内部 `Claude.exe` 导致的权限问题，不是包损坏。请改用安装脚本：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-windows.ps1
+```
+
+脚本会通过 AppX 激活接口把 `.mcpb` 路径交给 Claude Desktop，不会修改注册表或系统文件关联。
+
 ## 本地开发校验
 
 ```powershell

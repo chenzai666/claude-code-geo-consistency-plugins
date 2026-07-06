@@ -78,3 +78,10 @@ claude-desktop-geo-consistency/dist/claude-desktop-geo-consistency.mcpb
 - `geo_fix_terminal_proxy`
 
 `geo_fix_terminal_proxy` 默认 dry-run，不会直接修改环境；只有传 `apply=true` 才会写入用户级终端代理变量和 npm/git 代理配置。
+
+如果 Windows AppX 版 Claude Desktop 双击 `.mcpb` 弹出“Windows 无法访问指定设备、路径或文件”，请在仓库根目录运行：
+
+```powershell
+cd .\claude-desktop-geo-consistency
+powershell -ExecutionPolicy Bypass -File .\scripts\install-windows.ps1
+```

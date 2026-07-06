@@ -2,4 +2,5 @@ dist/
 node_modules/
 .git/
 tests/
+scripts/
 *.log
