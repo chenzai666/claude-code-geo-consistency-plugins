@@ -13,7 +13,7 @@
 - 系统代理状态
 - Anthropic / Claude 相关域名看到的出口 IP 和地区
 
-桌面版同样不 patch Claude Desktop 内部网络栈；它提供 MCP 工具，让你在 Claude Desktop 里检查系统代理、本地端口和 Claude/Anthropic 出口是否一致。
+桌面版同样不 patch Claude Desktop 内部网络栈；它提供 MCP 工具，让你在 Claude Desktop 里检查系统代理、本地端口和 Claude/Anthropic 出口是否一致。Desktop 扩展会按自己的配置只给 MCP server 进程补齐代理环境变量，让 server 默认 trace 和显式代理 trace 使用同一个出口。
 
 ## 安装建议
 

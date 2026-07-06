@@ -5,11 +5,14 @@ import os from "node:os";
 const DEFAULT_PROXY_HOST = process.env.GEO_PROXY_HOST || "127.0.0.1";
 const DEFAULT_HTTP_PORT = normalizePort(process.env.GEO_HTTP_PORT, 10808);
 const DEFAULT_SOCKS_PORT = normalizePort(process.env.GEO_SOCKS_PORT, 10808);
+const DEFAULT_NO_PROXY = process.env.NO_PROXY || process.env.no_proxy || "localhost,127.0.0.1,::1";
 const TRACE_TARGETS = Object.freeze({
   anthropicApi: "https://api.anthropic.com/cdn-cgi/trace",
   claudeWeb: "https://claude.ai/cdn-cgi/trace",
   cloudflare: "https://cloudflare.com/cdn-cgi/trace"
 });
+
+applyDefaultProxyEnvironment();
 
 const tools = [
   {
@@ -197,7 +200,7 @@ async function handleRequest(request) {
         },
         serverInfo: {
           name: "claude-desktop-geo-consistency",
-          version: "0.1.1"
+          version: "0.1.3"
         }
       }
     };
@@ -390,6 +393,25 @@ function normalizeConfig(args = {}) {
 function normalizePort(value, fallback) {
   const number = Number(value);
   return Number.isInteger(number) && number > 0 && number <= 65535 ? number : fallback;
+}
+
+function applyDefaultProxyEnvironment() {
+  const httpProxy = `http://${DEFAULT_PROXY_HOST}:${DEFAULT_HTTP_PORT}`;
+  const socksProxy = `socks5://${DEFAULT_PROXY_HOST}:${DEFAULT_SOCKS_PORT}`;
+  const values = {
+    HTTP_PROXY: httpProxy,
+    HTTPS_PROXY: httpProxy,
+    ALL_PROXY: socksProxy,
+    NO_PROXY: DEFAULT_NO_PROXY,
+    http_proxy: httpProxy,
+    https_proxy: httpProxy,
+    all_proxy: socksProxy,
+    no_proxy: DEFAULT_NO_PROXY
+  };
+
+  for (const [name, value] of Object.entries(values)) {
+    process.env[name] = value;
+  }
 }
 
 function readProxyEnvironment() {

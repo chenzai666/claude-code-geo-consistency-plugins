@@ -16,6 +16,8 @@
 
 这个默认值适合 v2rayN 开启系统代理到 `127.0.0.1:10808` 的情况。
 
+扩展启动 MCP server 时，会按这里的配置只给该 server 进程和它的子进程设置 `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY` / `NO_PROXY`。这不会写入系统环境变量；`geo_fix_terminal_proxy` 只用于需要让 Claude Code 或普通终端长期继承同一代理配置的场景。
+
 ## 隐私模型
 
 - 不读取 Claude 聊天内容。

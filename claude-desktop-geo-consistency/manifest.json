@@ -1,7 +1,7 @@
 {
-  "dxt_version": "0.1",
+  "manifest_version": "0.2",
   "name": "claude-desktop-geo-consistency",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "display_name": "Claude Desktop 出口一致性",
   "description": "在 Claude Desktop 中检查系统代理、本地代理端口、Anthropic/Claude 出口 IP 与地区是否一致。",
   "long_description": "提供本地 MCP 工具，用于诊断 Claude Desktop 所在机器的代理、出口 IP 和地区一致性。不会读取聊天内容，不做 telemetry，不收集网页内容。",
