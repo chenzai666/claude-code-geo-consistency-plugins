@@ -1,0 +1,71 @@
+{
+  "dxt_version": "0.1",
+  "name": "claude-desktop-geo-consistency",
+  "version": "0.1.0",
+  "display_name": "Claude Desktop 出口一致性",
+  "description": "在 Claude Desktop 中检查系统代理、本地代理端口、Anthropic/Claude 出口 IP 与地区是否一致。",
+  "long_description": "提供本地 MCP 工具，用于诊断 Claude Desktop 所在机器的代理、出口 IP 和地区一致性。不会读取聊天内容，不做 telemetry，不收集网页内容。",
+  "author": {
+    "name": "local"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/index.js"
+      ],
+      "env": {
+        "GEO_PROXY_HOST": "${user_config.proxy_host}",
+        "GEO_HTTP_PORT": "${user_config.http_port}",
+        "GEO_SOCKS_PORT": "${user_config.socks_port}"
+      }
+    }
+  },
+  "user_config": {
+    "proxy_host": {
+      "type": "string",
+      "title": "代理主机",
+      "description": "本地代理监听地址。",
+      "default": "127.0.0.1",
+      "required": true
+    },
+    "http_port": {
+      "type": "number",
+      "title": "HTTP 代理端口",
+      "description": "HTTP 或 mixed-port 代理端口。v2rayN 常见值是 10808。",
+      "default": 10808,
+      "required": true
+    },
+    "socks_port": {
+      "type": "number",
+      "title": "SOCKS 代理端口",
+      "description": "SOCKS 代理端口。如果使用 mixed-port，可以和 HTTP 端口相同。",
+      "default": 10808,
+      "required": true
+    }
+  },
+  "tools": [
+    {
+      "name": "geo_status",
+      "description": "查看 Claude Desktop 所在系统的代理环境、本地端口、npm/git 配置和可选出口 trace。"
+    },
+    {
+      "name": "geo_verify",
+      "description": "验证显式代理出口、Claude/Anthropic trace 和系统代理配置是否一致。"
+    },
+    {
+      "name": "geo_fix_terminal_proxy",
+      "description": "按需写入用户级终端代理变量和 npm/git 代理配置；默认 dry-run。"
+    }
+  ],
+  "keywords": [
+    "proxy",
+    "egress",
+    "geo",
+    "claude-desktop",
+    "mcp"
+  ],
+  "license": "MIT"
+}
