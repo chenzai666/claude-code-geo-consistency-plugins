@@ -77,7 +77,7 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\plugins\marketplaces\geo-c
 这个命令只打印下一次启动应注入的画像。要真正生效，请从外部 PowerShell 启动新的 Claude Code：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency-windows\scripts\geo-launch.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency-windows\scripts\geo-launch.ps1 -c
 ```
 
-launcher 只影响这次启动的子进程，不写入用户级环境变量，不修改 Windows 系统区域设置。Windows 上 `TZ` 通常能影响 Node/Claude Code timezone；语言会按出口 IP 注入到 `LANG`、`LC_ALL`、`LANGUAGE`、`ACCEPT_LANGUAGE`。但 Windows 上 Node/Bun 的默认 `Intl` locale 常来自系统区域设置，`LANG/LC_ALL` 不一定能改掉，`geo-verify` 会单独显示 `languageEnvMatchesExit` 和 `nodeLocaleMatchesExit`。
+launcher 只影响这次启动的子进程，不写入用户级代理环境变量，不修改 Windows 系统区域设置。未知参数会原样透传给 Claude Code，例如 `-c`、`--dangerously-skip-permissions`。Windows 上 `TZ` 通常能影响 Node/Claude Code timezone；语言会按出口 IP 注入到 `LANG`、`LC_ALL`、`LANGUAGE`、`ACCEPT_LANGUAGE`。但 Windows 上 Node/Bun 的默认 `Intl` locale 常来自系统区域设置，`LANG/LC_ALL` 不一定能改掉，`geo-verify` 会单独显示 `languageEnvMatchesExit` 和 `nodeLocaleMatchesExit`。

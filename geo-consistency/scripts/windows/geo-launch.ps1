@@ -1,15 +1,62 @@
-param(
-    [string]$ProxyHost = "127.0.0.1",
-    [int]$HttpPort = 10808,
-    [int]$SocksPort = 10808,
-    [string]$IpinfoToken = $env:IPINFO_TOKEN,
-    [string]$ClaudeCommand = "claude",
-    [switch]$PrintOnly,
-    [Parameter(ValueFromRemainingArguments = $true)]
-    [string[]]$ClaudeArgs
-)
-
 . "$PSScriptRoot\geo-common.ps1"
+
+$ProxyHost = "127.0.0.1"
+$HttpPort = 10808
+$SocksPort = 10808
+$IpinfoToken = $env:IPINFO_TOKEN
+$ClaudeCommand = "claude"
+$PrintOnly = $false
+$claudeArgsList = New-Object System.Collections.Generic.List[string]
+
+$rawArgs = @($args)
+$i = 0
+$passThrough = $false
+while ($i -lt $rawArgs.Count) {
+    $arg = [string]$rawArgs[$i]
+    if (-not $passThrough -and ($arg -eq "--proxy-host" -or $arg -eq "-ProxyHost")) {
+        if ($i + 1 -ge $rawArgs.Count) { Write-Error "$arg requires a value"; exit 2 }
+        $ProxyHost = [string]$rawArgs[$i + 1]
+        $i += 2
+        continue
+    }
+    if (-not $passThrough -and ($arg -eq "--http-port" -or $arg -eq "-HttpPort")) {
+        if ($i + 1 -ge $rawArgs.Count) { Write-Error "$arg requires a value"; exit 2 }
+        $HttpPort = [int]$rawArgs[$i + 1]
+        $i += 2
+        continue
+    }
+    if (-not $passThrough -and ($arg -eq "--socks-port" -or $arg -eq "-SocksPort")) {
+        if ($i + 1 -ge $rawArgs.Count) { Write-Error "$arg requires a value"; exit 2 }
+        $SocksPort = [int]$rawArgs[$i + 1]
+        $i += 2
+        continue
+    }
+    if (-not $passThrough -and ($arg -eq "--ipinfo-token" -or $arg -eq "-IpinfoToken")) {
+        if ($i + 1 -ge $rawArgs.Count) { Write-Error "$arg requires a value"; exit 2 }
+        $IpinfoToken = [string]$rawArgs[$i + 1]
+        $i += 2
+        continue
+    }
+    if (-not $passThrough -and ($arg -eq "--claude-command" -or $arg -eq "-ClaudeCommand")) {
+        if ($i + 1 -ge $rawArgs.Count) { Write-Error "$arg requires a value"; exit 2 }
+        $ClaudeCommand = [string]$rawArgs[$i + 1]
+        $i += 2
+        continue
+    }
+    if (-not $passThrough -and ($arg -eq "--print-only" -or $arg -eq "-PrintOnly")) {
+        $PrintOnly = $true
+        $i += 1
+        continue
+    }
+    if (-not $passThrough -and $arg -eq "--") {
+        $passThrough = $true
+        $i += 1
+        continue
+    }
+    $claudeArgsList.Add($arg)
+    $i += 1
+}
+$ClaudeArgs = [string[]]$claudeArgsList.ToArray()
 
 $httpProxy = Get-GeoDefaultProxyUrl $ProxyHost $HttpPort
 $socksProxy = Get-GeoDefaultSocksUrl $ProxyHost $SocksPort

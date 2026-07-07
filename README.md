@@ -101,7 +101,7 @@
 
 ```powershell
 cd D:\codex-demo\claude-code-geo-consistency-plugins
-powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency\scripts\windows\geo-launch.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency\scripts\windows\geo-launch.ps1 -c
 ```
 
 macOS：
@@ -112,6 +112,8 @@ bash ./geo-consistency/scripts/macos/geo-launch.sh
 ```
 
 launcher 会先按代理出口 IP 查询地理画像，再给子进程注入 `TZ`、`LANG`、`LC_ALL`、`LC_MESSAGES`、`LANGUAGE`、`ACCEPT_LANGUAGE` 以及代理变量，最后启动 `claude`。它不写入用户级环境变量，也不修改系统区域设置。
+
+Windows 版 launcher 会把未知参数原样透传给 Claude Code，例如 `-c`、`--dangerously-skip-permissions`。如果要把 `--print-only` 或 `--claude-command` 当作 Claude Code 参数传入，请用 `--` 分隔。
 
 注意：`TZ` 对 Node/Claude Code 的默认 timezone 通常生效；语言会按出口 IP 注入到 `LANG`、`LC_ALL`、`LANGUAGE`、`ACCEPT_LANGUAGE`。但 Windows 上 Node/Bun 的默认 `Intl` locale 往往来自系统区域设置，`LANG/LC_ALL` 不一定能把 `Intl.DateTimeFormat().resolvedOptions().locale` 从 `zh-CN` 改成 `en-US`。插件会保证子进程语言环境变量和时区一致，并在 `verify` 表格里单独显示 `languageEnvMatchesExit` 与 `nodeLocaleMatchesExit`。
 
