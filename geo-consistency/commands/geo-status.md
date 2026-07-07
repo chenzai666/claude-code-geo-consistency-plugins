@@ -1,5 +1,5 @@
 ---
-description: 自动按当前系统查看 Claude Code 代理、工具代理和出口状态
+description: 自动按当前系统查看 Claude Code 本地代理、环境变量和工具代理状态
 allowed-tools:
   - Bash(powershell.exe:*)
   - Bash(pwsh:*)
@@ -7,7 +7,9 @@ allowed-tools:
   - Bash(sh:*)
 ---
 
-Run the unified geo consistency status command and summarize the result.
+Run the unified geo consistency status command. Status is a local runtime snapshot: proxy ports, process environment, system proxy, and npm/git proxy config. It is intentionally not the same as verify.
+
+Preserve the script output. Do not turn it into a verification verdict.
 
 First detect the current operating system from the Claude Code runtime:
 

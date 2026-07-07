@@ -48,6 +48,8 @@
 /geo-consistency:geo-verify
 ```
 
+`geo-status` 默认只看本地配置和进程环境，不做外部出口请求；如需把出口 trace 加到 status 里，Windows 传 `-IncludeNetwork`，macOS 传 `--include-network`。`geo-verify` 才会做直连、终端默认路由、显式代理、Claude/Anthropic trace 的一致性对比，并以表格输出结论。
+
 单平台入口可用命令：
 
 ```text

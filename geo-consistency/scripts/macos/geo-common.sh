@@ -8,7 +8,7 @@ geo_parse_args() {
   GEO_SOCKS_PORT="10808"
   GEO_RC_FILE="${HOME}/.zshrc"
   GEO_JSON="0"
-  GEO_SKIP_NETWORK="0"
+  GEO_SKIP_NETWORK="1"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -24,6 +24,8 @@ geo_parse_args() {
         GEO_JSON="1"; shift ;;
       --skip-network)
         GEO_SKIP_NETWORK="1"; shift ;;
+      --include-network)
+        GEO_SKIP_NETWORK="0"; shift ;;
       *)
         echo "Unknown argument: $1" >&2; return 2 ;;
     esac

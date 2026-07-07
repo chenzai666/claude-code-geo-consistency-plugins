@@ -46,4 +46,6 @@ if [ "$GEO_SKIP_NETWORK" != "1" ]; then
   geo_trace "env-default" "https://claude.ai/cdn-cgi/trace"
   printf '\n'
   geo_trace "explicit-proxy" "https://cloudflare.com/cdn-cgi/trace" "$HTTP_PROXY_URL"
+else
+  printf '\nTip: status is local-only by default. Use --include-network to add egress traces.\n'
 fi

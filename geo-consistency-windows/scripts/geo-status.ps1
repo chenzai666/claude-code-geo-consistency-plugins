@@ -3,7 +3,8 @@ param(
     [int]$HttpPort = 10808,
     [int]$SocksPort = 10808,
     [switch]$Json,
-    [switch]$SkipNetwork
+    [switch]$SkipNetwork,
+    [switch]$IncludeNetwork
 )
 
 . "$PSScriptRoot\geo-common.ps1"
@@ -25,7 +26,7 @@ $status = [ordered]@{
     traces = @()
 }
 
-if (-not $SkipNetwork) {
+if ($IncludeNetwork -and -not $SkipNetwork) {
     $status.traces = @(
         Invoke-GeoTrace "https://api.anthropic.com/cdn-cgi/trace"
         Invoke-GeoTrace "https://claude.ai/cdn-cgi/trace"
@@ -59,7 +60,7 @@ foreach ($key in $status.tools.Keys) {
     Write-GeoKV $key $status.tools[$key]
 }
 
-if (-not $SkipNetwork) {
+if ($IncludeNetwork -and -not $SkipNetwork) {
     Write-GeoSection "Egress Traces"
     foreach ($trace in $status.traces) {
         Write-Host ""
@@ -74,4 +75,7 @@ if (-not $SkipNetwork) {
             Write-GeoKV "error" $trace.error
         }
     }
+} else {
+    Write-Host ""
+    Write-Host "Tip: status is local-only by default. Use -IncludeNetwork to add egress traces."
 }

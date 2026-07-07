@@ -30,6 +30,8 @@
 /geo-consistency-macos:geo-verify --http-port 10808 --socks-port 10808
 ```
 
+`geo-status` 默认是本地快照，不做外部出口请求；需要追加 trace 时传 `--include-network`。`geo-verify` 才做一致性对比，并输出 Markdown 表格。
+
 ## 使用边界
 
 插件不会写入 `~/.zshrc`、`~/.bashrc` 或用户级环境变量。它只读取 Claude Code 当前进程已经继承到的 shell 环境，并做一致性验证。

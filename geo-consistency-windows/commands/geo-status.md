@@ -1,11 +1,13 @@
 ---
-description: 查看 Windows Claude Code 代理、工具代理和出口状态
+description: 查看 Windows Claude Code 本地代理、环境变量和工具代理状态
 allowed-tools:
   - Bash(powershell.exe:*)
   - Bash(pwsh:*)
 ---
 
-Run the Windows geo consistency status script and summarize the result.
+Run the Windows geo consistency status script. Status is a local runtime snapshot: proxy ports, process environment, Windows system proxy, and npm/git proxy config.
+
+Preserve the script output. Do not turn it into a verification verdict.
 
 Use:
 

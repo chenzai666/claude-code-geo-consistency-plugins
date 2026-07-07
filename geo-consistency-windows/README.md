@@ -31,6 +31,8 @@
 /geo-consistency-windows:geo-verify -HttpPort 10808 -SocksPort 10808
 ```
 
+`geo-status` 默认是本地快照，不做外部出口请求；需要追加 trace 时传 `-IncludeNetwork`。`geo-verify` 才做一致性对比，并输出 Markdown 表格。
+
 ## 使用边界
 
 插件不会写入用户级环境变量，也不会修改 Windows 系统代理。它只读取 Claude Code 当前进程已经继承到的环境，并做一致性验证。

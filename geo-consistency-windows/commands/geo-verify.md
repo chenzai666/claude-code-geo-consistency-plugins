@@ -1,11 +1,13 @@
 ---
-description: 验证 Windows Claude Code 直连、环境代理和显式代理出口是否一致
+description: 验证 Windows Claude Code 默认出口、显式代理出口和 Claude/Anthropic 出口是否一致
 allowed-tools:
   - Bash(powershell.exe:*)
   - Bash(pwsh:*)
 ---
 
-Run the Windows geo consistency verifier and report whether Claude Code's terminal environment, explicit proxy route, and Anthropic endpoints agree.
+Run the Windows geo consistency verifier. Verify is an external route comparison: direct route, terminal default route, explicit proxy route, and Claude/Anthropic trace route.
+
+Preserve the Markdown tables printed by the script. Do not rewrite them as prose unless the user asks for a summary.
 
 Use:
 

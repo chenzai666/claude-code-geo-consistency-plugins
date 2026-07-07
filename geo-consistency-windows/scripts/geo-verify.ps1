@@ -51,39 +51,66 @@ if ($Json) {
     exit 0
 }
 
-Write-GeoSection "Claude Code Geo Verify (Windows)"
-Write-GeoKV "Expected proxy" $httpProxy
-
-Write-GeoSection "Checks"
-foreach ($key in $checks.Keys) {
-    Write-GeoKV $key $checks[$key]
-}
-
-Write-GeoSection "Trace Summary"
-foreach ($name in $result.traces.Keys) {
-    $trace = $result.traces[$name]
-    Write-Host ""
-    Write-GeoKV "route" $name
-    Write-GeoKV "ok" $trace.ok
-    Write-GeoKV "ip" $trace.ip
-    Write-GeoKV "loc" $trace.loc
-    Write-GeoKV "colo" $trace.colo
-    if (-not $trace.ok) {
-        Write-GeoKV "error" $trace.error
+function Format-GeoMarkdownCell {
+    param([object]$Value)
+    if ($null -eq $Value -or [string]$Value -eq "") {
+        return "-"
     }
+    return ([string]$Value) -replace "\|", "\|" -replace "(`r`n|`n|`r)", "<br>"
 }
 
-Write-GeoSection "Verdict"
+function Get-GeoObjectValue {
+    param([object]$Object, [string]$Name)
+    if ($null -eq $Object) {
+        return ""
+    }
+    $property = $Object.PSObject.Properties[$Name]
+    if ($null -eq $property) {
+        return ""
+    }
+    return $property.Value
+}
+
 if (-not $checks.proxyPortOpen) {
-    Write-Host "FAIL: local proxy port is not reachable."
+    $verdict = "FAIL: local proxy port is not reachable."
 } elseif (-not $checks.explicitProxyWorks) {
-    Write-Host "FAIL: explicit proxy route cannot reach Anthropic trace."
+    $verdict = "FAIL: explicit proxy route cannot reach Anthropic trace."
 } elseif (-not $checks.envDefaultMatchesExplicit) {
     if (-not $checks.terminalHasHttpProxy -or -not $checks.terminalHasHttpsProxy) {
-        Write-Host "WARN: explicit proxy works, but Claude Code's terminal env lacks effective HTTP/HTTPS proxy variables."
+        $verdict = "WARN: explicit proxy works, but Claude Code's terminal env lacks effective HTTP/HTTPS proxy variables."
     } else {
-        Write-Host "WARN: terminal default route does not match explicit proxy route."
+        $verdict = "WARN: terminal default route does not match explicit proxy route."
     }
 } else {
-    Write-Host "OK: Claude Code terminal egress is consistent with the explicit proxy route."
+    $verdict = "OK: Claude Code terminal egress is consistent with the explicit proxy route."
+}
+
+Write-Host "## Claude Code Geo Verify (Windows)"
+Write-Host ""
+Write-Host "| Item | Value |"
+Write-Host "|---|---|"
+Write-Host ("| Expected proxy | {0} |" -f (Format-GeoMarkdownCell $httpProxy))
+Write-Host ("| Verdict | {0} |" -f (Format-GeoMarkdownCell $verdict))
+Write-Host ""
+Write-Host "### Checks"
+Write-Host ""
+Write-Host "| Check | Value |"
+Write-Host "|---|---|"
+foreach ($key in $checks.Keys) {
+    Write-Host ("| {0} | {1} |" -f (Format-GeoMarkdownCell $key), (Format-GeoMarkdownCell $checks[$key]))
+}
+Write-Host ""
+Write-Host "### Trace Summary"
+Write-Host ""
+Write-Host "| Route | OK | IP | Location | Colo | Error |"
+Write-Host "|---|---|---|---|---|---|"
+foreach ($name in $result.traces.Keys) {
+    $trace = $result.traces[$name]
+    Write-Host ("| {0} | {1} | {2} | {3} | {4} | {5} |" -f `
+        (Format-GeoMarkdownCell $name), `
+        (Format-GeoMarkdownCell $trace.ok), `
+        (Format-GeoMarkdownCell $trace.ip), `
+        (Format-GeoMarkdownCell $trace.loc), `
+        (Format-GeoMarkdownCell $trace.colo), `
+        (Format-GeoMarkdownCell (Get-GeoObjectValue $trace "error")))
 }

@@ -29,6 +29,8 @@ macOS 上也可以使用 macOS 脚本参数：
 /geo-consistency:geo-verify --http-port 10808 --socks-port 10808
 ```
 
+`geo-status` 默认是本地快照，不做外部出口请求；Windows 可传 `-IncludeNetwork`、macOS 可传 `--include-network` 追加 trace。`geo-verify` 才做一致性对比，并输出 Markdown 表格。
+
 ## 平台行为
 
 - Windows：调用 `scripts/windows/*.ps1`，只读取当前 Claude Code 进程环境、系统代理摘要、npm/git 代理和出口 trace。
