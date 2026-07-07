@@ -8,6 +8,9 @@ param(
 
 . "$PSScriptRoot\geo-common.ps1"
 
+if (-not $PSBoundParameters.ContainsKey('HttpPort'))  { $HttpPort  = Get-GeoAutoDetectPort $ProxyHost }
+if (-not $PSBoundParameters.ContainsKey('SocksPort')) { $SocksPort = Get-GeoAutoDetectPort $ProxyHost }
+
 $httpProxy = Get-GeoDefaultProxyUrl $ProxyHost $HttpPort
 $envState = Get-GeoEnvProxyState
 $systemProxy = Get-GeoWindowsSystemProxy

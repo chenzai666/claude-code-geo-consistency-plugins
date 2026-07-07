@@ -1,8 +1,9 @@
 . "$PSScriptRoot\geo-common.ps1"
 
 $ProxyHost = "127.0.0.1"
-$HttpPort = 10808
-$SocksPort = 10808
+$_autoPort = Get-GeoAutoDetectPort $ProxyHost
+$HttpPort = $_autoPort
+$SocksPort = $_autoPort
 $IpinfoToken = $env:IPINFO_TOKEN
 $ClaudeCommand = "claude"
 $PrintOnly = $false

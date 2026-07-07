@@ -1,5 +1,13 @@
 Set-StrictMode -Version Latest
 
+function Get-GeoAutoDetectPort {
+    param([string]$ProxyHost = "127.0.0.1")
+    foreach ($p in @(10808, 7890, 7891, 7897)) {
+        if (Test-GeoTcpPort -HostName $ProxyHost -Port $p -TimeoutMs 800) { return $p }
+    }
+    return 10808
+}
+
 function Test-GeoTcpPort {
     param(
         [string]$HostName,

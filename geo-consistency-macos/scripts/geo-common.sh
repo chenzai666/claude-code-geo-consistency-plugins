@@ -4,8 +4,15 @@ set -u
 
 geo_parse_args() {
   GEO_PROXY_HOST="127.0.0.1"
+  # Auto-detect listening proxy port: v2rayN(10808) → Clash(7890/7891) → sing-box(7897)
   GEO_HTTP_PORT="10808"
   GEO_SOCKS_PORT="10808"
+  for _geo_p in 10808 7890 7891 7897; do
+    if nc -z -G 1 "127.0.0.1" "$_geo_p" >/dev/null 2>&1; then
+      GEO_HTTP_PORT="$_geo_p"; GEO_SOCKS_PORT="$_geo_p"; break
+    fi
+  done
+  unset _geo_p
   GEO_RC_FILE="${HOME}/.zshrc"
   GEO_JSON="0"
   GEO_SKIP_NETWORK="1"
