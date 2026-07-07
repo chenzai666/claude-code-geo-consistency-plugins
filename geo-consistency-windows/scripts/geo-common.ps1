@@ -23,14 +23,52 @@ function Test-GeoTcpPort {
 }
 
 function Get-GeoEnvProxyState {
+    $processEnv = [Environment]::GetEnvironmentVariables("Process")
+
+    function Read-ProcessEnvValue {
+        param([string]$Name)
+
+        if ($processEnv.Contains($Name)) {
+            return [string]$processEnv[$Name]
+        }
+
+        foreach ($key in $processEnv.Keys) {
+            if ([string]::Equals([string]$key, $Name, [System.StringComparison]::OrdinalIgnoreCase)) {
+                return [string]$processEnv[$key]
+            }
+        }
+
+        return ""
+    }
+
+    function Read-FirstProcessEnvValue {
+        param([string[]]$Names)
+
+        foreach ($name in $Names) {
+            $value = Read-ProcessEnvValue $name
+            if ($value) {
+                return $value
+            }
+        }
+
+        return ""
+    }
+
     $names = @(
-        "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY",
+        "HTTP_PROXY", "http_proxy",
+        "HTTPS_PROXY", "https_proxy",
+        "ALL_PROXY", "all_proxy",
+        "NO_PROXY", "no_proxy",
         "ANTHROPIC_BASE_URL", "TZ", "LANG", "LC_ALL"
     )
     $state = [ordered]@{}
     foreach ($name in $names) {
-        $state[$name] = [Environment]::GetEnvironmentVariable($name, "Process")
+        $state[$name] = Read-ProcessEnvValue $name
     }
+    $state["effectiveHttpProxy"] = Read-FirstProcessEnvValue @("HTTP_PROXY", "http_proxy")
+    $state["effectiveHttpsProxy"] = Read-FirstProcessEnvValue @("HTTPS_PROXY", "https_proxy")
+    $state["effectiveAllProxy"] = Read-FirstProcessEnvValue @("ALL_PROXY", "all_proxy")
+    $state["effectiveNoProxy"] = Read-FirstProcessEnvValue @("NO_PROXY", "no_proxy")
     return $state
 }
 

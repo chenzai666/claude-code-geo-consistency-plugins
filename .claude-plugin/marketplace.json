@@ -7,8 +7,8 @@
     {
       "name": "geo-consistency",
       "source": "./geo-consistency",
-      "description": "Unified Claude Code proxy, egress IP, and runtime consistency checks for Windows and macOS.",
-      "version": "0.1.0",
+      "description": "统一版 Claude Code 代理、出口 IP 和运行时环境一致性检查，自动适配 Windows/macOS。",
+      "version": "0.1.1",
       "author": {
         "name": "local"
       }
@@ -16,8 +16,8 @@
     {
       "name": "geo-consistency-windows",
       "source": "./geo-consistency-windows",
-      "description": "Windows Claude Code proxy, egress IP, and runtime consistency checks for local proxies such as v2rayN.",
-      "version": "0.1.0",
+      "description": "Windows Claude Code 代理、出口 IP 和运行时环境一致性检查，默认适配 v2rayN。",
+      "version": "0.1.1",
       "author": {
         "name": "local"
       }
@@ -25,8 +25,8 @@
     {
       "name": "geo-consistency-macos",
       "source": "./geo-consistency-macos",
-      "description": "macOS Claude Code proxy, egress IP, and runtime consistency checks for local proxies.",
-      "version": "0.1.0",
+      "description": "macOS Claude Code 代理、出口 IP 和运行时环境一致性检查。",
+      "version": "0.1.1",
       "author": {
         "name": "local"
       }

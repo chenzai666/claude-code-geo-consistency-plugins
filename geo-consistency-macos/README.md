@@ -1,6 +1,6 @@
 # Geo Consistency macOS
 
-这是 macOS 版 Claude Code 出口一致性插件，用来检查和修复 Claude Code 当前 shell 环境是否真的走本地代理出口。
+这是 macOS 版 Claude Code 出口一致性插件，用来检查当前 Claude Code shell 环境是否真的走本地代理出口，并确认 Anthropic/Claude 相关请求看到的出口是否一致。
 
 默认配置：
 
@@ -10,7 +10,7 @@
 
 ## 会检查什么
 
-- Claude Code 进程环境变量：`HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY`、`NO_PROXY`
+- Claude Code 当前进程环境变量：`HTTP_PROXY`、`http_proxy`、`HTTPS_PROXY`、`https_proxy`、`ALL_PROXY`、`all_proxy`、`NO_PROXY`、`no_proxy`
 - macOS 系统代理摘要：`scutil --proxy`
 - 本地代理端口是否可连接，默认检查 `127.0.0.1:10808`
 - npm / git 全局代理配置
@@ -21,20 +21,41 @@
 ```text
 /geo-consistency-macos:geo-status
 /geo-consistency-macos:geo-verify
-/geo-consistency-macos:geo-fix
 ```
 
-可以在命令后传参数覆盖默认端口或 rc 文件，例如：
+可以在命令后传参数覆盖默认端口，例如：
 
 ```text
 /geo-consistency-macos:geo-status --http-port 10808 --socks-port 10808
-/geo-consistency-macos:geo-fix --http-port 7890 --socks-port 7891 --rc-file "$HOME/.zshrc"
+/geo-consistency-macos:geo-verify --http-port 10808 --socks-port 10808
 ```
 
-## 命令说明
+## 使用边界
 
-- `geo-status`：查看当前 Claude Code shell 环境、macOS 系统代理、npm/git 代理和出口状态。
-- `geo-verify`：对比直连、终端默认路由、显式代理路由、Claude/Anthropic 相关域名出口是否一致。
-- `geo-fix`：把代理环境变量写入 shell rc 文件，并配置 npm/git 代理。
+插件不会写入 `~/.zshrc`、`~/.bashrc` 或用户级环境变量。它只读取 Claude Code 当前进程已经继承到的 shell 环境，并做一致性验证。
 
-`geo-fix` 会写入 rc 文件，默认是 `~/.zshrc`。已经运行中的 Claude Code 进程不会自动继承这些变化；运行后需要从新终端重新启动 Claude Code，或者先 `source` 对应 rc 文件再启动。
+如果要让 Claude Code 继承代理，请先配置 shell rc 或运行你的代理设置脚本，然后从这个终端启动 Claude Code。
+
+`geo-fix` 已移除，因为子进程不能反向修改已经运行中的 Claude Code 父进程环境。
+
+## 卸载
+
+在 Claude Code 中执行：
+
+```text
+/plugin uninstall geo-consistency-macos@geo-consistency
+/reload-plugins
+```
+
+如需移除 marketplace，可以在 `/plugin` 的 marketplace 管理界面删除 `geo-consistency`，或在终端执行：
+
+```bash
+claude plugin marketplace remove geo-consistency --scope user
+```
+
+手动清理缓存：
+
+```bash
+rm -rf "$HOME/.claude/plugins/cache/geo-consistency"
+rm -rf "$HOME/.claude/plugins/marketplaces/geo-consistency"
+```

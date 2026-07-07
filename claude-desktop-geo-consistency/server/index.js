@@ -200,7 +200,7 @@ async function handleRequest(request) {
         },
         serverInfo: {
           name: "claude-desktop-geo-consistency",
-          version: "0.1.3"
+          version: "0.1.4"
         }
       }
     };

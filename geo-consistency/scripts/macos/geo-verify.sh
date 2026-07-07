@@ -9,6 +9,9 @@ geo_parse_args "$@" || exit $?
 
 HTTP_PROXY_URL="$(geo_http_proxy)"
 TARGET="https://api.anthropic.com/cdn-cgi/trace"
+EFFECTIVE_HTTP_PROXY="${HTTP_PROXY:-${http_proxy:-}}"
+EFFECTIVE_HTTPS_PROXY="${HTTPS_PROXY:-${https_proxy:-}}"
+EFFECTIVE_ALL_PROXY="${ALL_PROXY:-${all_proxy:-}}"
 
 DIRECT_TRACE="$(geo_trace "forced-direct" "$TARGET")"
 ENV_TRACE="$(geo_trace "env-default" "$TARGET")"
@@ -31,9 +34,9 @@ else
   PORT_OPEN="false"
 fi
 geo_kv "proxyPortOpen" "$PORT_OPEN"
-geo_kv "terminalHasHTTP_PROXY" "${HTTP_PROXY:+true}"
-geo_kv "terminalHasHTTPS_PROXY" "${HTTPS_PROXY:+true}"
-geo_kv "terminalHasALL_PROXY" "${ALL_PROXY:+true}"
+geo_kv "terminalHasHttpProxy" "${EFFECTIVE_HTTP_PROXY:+true}"
+geo_kv "terminalHasHttpsProxy" "${EFFECTIVE_HTTPS_PROXY:+true}"
+geo_kv "terminalHasAllProxy" "${EFFECTIVE_ALL_PROXY:+true}"
 geo_kv "directIp" "$DIRECT_IP"
 geo_kv "envIp" "$ENV_IP"
 geo_kv "proxyIp" "$PROXY_IP"
@@ -48,10 +51,12 @@ if [ "$PORT_OPEN" != "true" ]; then
   echo "FAIL: local proxy port is not reachable."
 elif [ -z "$PROXY_IP" ]; then
   echo "FAIL: explicit proxy route cannot reach Anthropic trace."
-elif [ -z "${HTTP_PROXY:-}" ] || [ -z "${HTTPS_PROXY:-}" ]; then
-  echo "WARN: explicit proxy works, but Claude Code's terminal env lacks HTTP_PROXY/HTTPS_PROXY."
 elif [ "$ENV_IP" != "$PROXY_IP" ]; then
-  echo "WARN: terminal default route does not match explicit proxy route."
+  if [ -z "$EFFECTIVE_HTTP_PROXY" ] || [ -z "$EFFECTIVE_HTTPS_PROXY" ]; then
+    echo "WARN: explicit proxy works, but Claude Code's terminal env lacks effective HTTP/HTTPS proxy variables."
+  else
+    echo "WARN: terminal default route does not match explicit proxy route."
+  fi
 else
   echo "OK: Claude Code terminal egress is consistent with the explicit proxy route."
 fi

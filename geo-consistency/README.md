@@ -13,27 +13,57 @@
 ```text
 /geo-consistency:geo-status
 /geo-consistency:geo-verify
-/geo-consistency:geo-fix
 ```
 
 参数会原样传给对应平台脚本：
 
 ```text
 /geo-consistency:geo-status -HttpPort 10808 -SocksPort 10808
-/geo-consistency:geo-fix -HttpPort 7890 -SocksPort 7891
+/geo-consistency:geo-verify -HttpPort 10808 -SocksPort 10808
 ```
 
-在 macOS 上也可以使用 macOS 脚本参数：
+macOS 上也可以使用 macOS 脚本参数：
 
 ```text
 /geo-consistency:geo-status --http-port 10808 --socks-port 10808
-/geo-consistency:geo-fix --http-port 7890 --socks-port 7891 --rc-file "$HOME/.zshrc"
+/geo-consistency:geo-verify --http-port 10808 --socks-port 10808
 ```
 
 ## 平台行为
 
-- Windows：调用 `scripts/windows/*.ps1`，写入用户级代理环境变量，并配置 npm/git 代理。
-- macOS：调用 `scripts/macos/*.sh`，写入 shell rc 文件，并配置 npm/git 代理。
+- Windows：调用 `scripts/windows/*.ps1`，只读取当前 Claude Code 进程环境、系统代理摘要、npm/git 代理和出口 trace。
+- macOS：调用 `scripts/macos/*.sh`，只读取当前 Claude Code shell 环境、系统代理摘要、npm/git 代理和出口 trace。
 - Linux：暂未支持，会提示安装或扩展对应脚本。
 
-如果你明确只想使用某个平台入口，原来的 `geo-consistency-windows` 和 `geo-consistency-macos` 插件仍然保留。
+插件不会写入用户级环境变量、shell rc 文件或系统代理。`geo-fix` 已移除，因为子进程不能反向修改已经运行中的 Claude Code 父进程环境。
+
+如果要让 Claude Code 继承代理，请先运行 `proxy-setup` 或手动配置 shell 环境，然后从这个终端启动 Claude Code。
+
+## 卸载
+
+在 Claude Code 中执行：
+
+```text
+/plugin uninstall geo-consistency@geo-consistency
+/reload-plugins
+```
+
+如需移除 marketplace，可以在 `/plugin` 的 marketplace 管理界面删除 `geo-consistency`，或在终端执行：
+
+```powershell
+claude plugin marketplace remove geo-consistency --scope user
+```
+
+手动清理缓存：
+
+```powershell
+Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\plugins\cache\geo-consistency" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\plugins\marketplaces\geo-consistency" -ErrorAction SilentlyContinue
+```
+
+macOS/Linux：
+
+```bash
+rm -rf "$HOME/.claude/plugins/cache/geo-consistency"
+rm -rf "$HOME/.claude/plugins/marketplaces/geo-consistency"
+```

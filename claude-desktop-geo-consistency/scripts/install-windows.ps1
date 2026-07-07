@@ -13,14 +13,14 @@ if (-not $AppUserModelId) {
     Select-Object -First 1
 
   if (-not $claudeApp) {
-    throw "未找到 Claude Desktop AppX 入口。请先安装并启动一次 Claude Desktop。"
+    throw "Claude Desktop AppX entry was not found. Install and launch Claude Desktop once first."
   }
 
   $AppUserModelId = $claudeApp.AppID
 }
 
 if (-not ("ClaudeDesktopMcpbInstaller.AppxLauncher" -as [type])) {
-  Add-Type -TypeDefinition @"
+  Add-Type -TypeDefinition @'
 using System;
 using System.Runtime.InteropServices;
 
@@ -52,6 +52,7 @@ namespace ClaudeDesktopMcpbInstaller
         int ActivateForProtocol(
             [MarshalAs(UnmanagedType.LPWStr)] string appUserModelId,
             IntPtr itemArray,
+            [MarshalAs(UnmanagedType.LPWStr)] string verb,
             out uint processId);
     }
 
@@ -73,15 +74,15 @@ namespace ClaudeDesktopMcpbInstaller
         }
     }
 }
-"@
+'@
 }
 
 $quotedMcpb = '"' + $resolvedMcpb + '"'
 $launchedProcessId = [ClaudeDesktopMcpbInstaller.AppxLauncher]::Activate($AppUserModelId, $quotedMcpb)
 
-Write-Host "已请求 Claude Desktop 安装 MCPB：" -ForegroundColor Green
+Write-Host "Requested Claude Desktop MCPB install:" -ForegroundColor Green
 Write-Host "  AppUserModelId: $AppUserModelId"
 Write-Host "  MCPB: $resolvedMcpb"
 Write-Host "  ProcessId: $launchedProcessId"
 Write-Host ""
-Write-Host "如果 Claude Desktop 弹出安装确认，请点击 Install。安装后进入 Settings > Extensions 检查是否启用。" -ForegroundColor Yellow
+Write-Host "If Claude Desktop opens an install confirmation, click Install. Then check Settings > Extensions." -ForegroundColor Yellow

@@ -21,9 +21,9 @@ $claudeWebProxy = Invoke-GeoTrace "https://claude.ai/cdn-cgi/trace" -Proxy $http
 $expectedLoc = $explicitProxy.loc
 $checks = [ordered]@{
     proxyPortOpen = Test-GeoTcpPort $ProxyHost $HttpPort
-    terminalHasHttpProxy = [bool]$envState.HTTP_PROXY
-    terminalHasHttpsProxy = [bool]$envState.HTTPS_PROXY
-    terminalHasAllProxy = [bool]$envState.ALL_PROXY
+    terminalHasHttpProxy = [bool]$envState.effectiveHttpProxy
+    terminalHasHttpsProxy = [bool]$envState.effectiveHttpsProxy
+    terminalHasAllProxy = [bool]$envState.effectiveAllProxy
     windowsSystemProxyEnabled = [bool]$systemProxy.ProxyEnable
     explicitProxyWorks = [bool]$explicitProxy.ok
     anthropicProxyLocation = $expectedLoc
@@ -78,10 +78,12 @@ if (-not $checks.proxyPortOpen) {
     Write-Host "FAIL: local proxy port is not reachable."
 } elseif (-not $checks.explicitProxyWorks) {
     Write-Host "FAIL: explicit proxy route cannot reach Anthropic trace."
-} elseif (-not $checks.terminalHasHttpProxy -or -not $checks.terminalHasHttpsProxy) {
-    Write-Host "WARN: explicit proxy works, but Claude Code's terminal env lacks HTTP_PROXY/HTTPS_PROXY."
 } elseif (-not $checks.envDefaultMatchesExplicit) {
-    Write-Host "WARN: terminal default route does not match explicit proxy route."
+    if (-not $checks.terminalHasHttpProxy -or -not $checks.terminalHasHttpsProxy) {
+        Write-Host "WARN: explicit proxy works, but Claude Code's terminal env lacks effective HTTP/HTTPS proxy variables."
+    } else {
+        Write-Host "WARN: terminal default route does not match explicit proxy route."
+    }
 } else {
     Write-Host "OK: Claude Code terminal egress is consistent with the explicit proxy route."
 }
