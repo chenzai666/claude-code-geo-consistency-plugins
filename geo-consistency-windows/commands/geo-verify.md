@@ -7,7 +7,7 @@ allowed-tools:
 
 Run the Windows geo consistency verifier. Verify is an external route comparison: direct route, terminal default route, explicit proxy route, and Claude/Anthropic trace route.
 
-Preserve the Markdown tables printed by the script. Do not rewrite them as prose unless the user asks for a summary.
+Final response contract: paste the command stdout exactly as the answer. Do not summarize it, do not convert it to bullets, and do not add an intro sentence. If stdout contains Markdown tables, preserve those tables directly.
 
 Use:
 

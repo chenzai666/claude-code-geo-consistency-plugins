@@ -9,7 +9,7 @@ allowed-tools:
 
 Run the unified geo consistency status command. Status is a local runtime snapshot: proxy ports, process environment, system proxy, and npm/git proxy config. It is intentionally not the same as verify.
 
-Preserve the script output. Do not turn it into a verification verdict.
+Final response contract: paste the command stdout exactly as the answer. Do not summarize it, do not convert it to bullets, do not add an intro sentence, and do not turn it into a verification verdict.
 
 First detect the current operating system from the Claude Code runtime:
 

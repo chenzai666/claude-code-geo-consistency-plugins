@@ -1,6 +1,6 @@
 {
   "name": "geo-consistency-macos",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "macOS Claude Code 代理、出口 IP 和运行时环境一致性检查。",
   "author": {
     "name": "local"

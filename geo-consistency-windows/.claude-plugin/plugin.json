@@ -1,6 +1,6 @@
 {
   "name": "geo-consistency-windows",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Windows Claude Code 代理、出口 IP 和运行时环境一致性检查，默认适配 v2rayN。",
   "author": {
     "name": "local"

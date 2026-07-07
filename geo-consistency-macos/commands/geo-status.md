@@ -7,7 +7,7 @@ allowed-tools:
 
 Run the macOS geo consistency status script. Status is a local runtime snapshot: proxy ports, process environment, macOS system proxy, and npm/git proxy config.
 
-Preserve the script output. Do not turn it into a verification verdict.
+Final response contract: paste the command stdout exactly as the answer. Do not summarize it, do not convert it to bullets, do not add an intro sentence, and do not turn it into a verification verdict.
 
 Use:
 
