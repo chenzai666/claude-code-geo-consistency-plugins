@@ -7,7 +7,7 @@
 ## 目录
 
 - `geo-consistency`：统一版 Claude Code 插件，优先推荐安装，会按当前系统自动调用 Windows 或 macOS 脚本。
-- `geo-consistency-windows`：Windows 单平台入口，默认面向 v2rayN / PowerShell / `127.0.0.1:10808`。
+- `geo-consistency-windows`：Windows 单平台入口，面向 v2rayN / Clash / sing-box，自动检测本地代理端口。
 - `geo-consistency-macos`：macOS 单平台入口，面向 zsh/bash 和本地代理端口检测。
 - `claude-desktop-geo-consistency`：Claude Desktop Desktop Extension/MCPB 版本。
 
@@ -70,10 +70,9 @@
 ## 默认值
 
 - 代理主机：`127.0.0.1`
-- HTTP 代理端口：`10808`
-- SOCKS 代理端口：`10808`
+- 代理端口：**自动检测**，按 v2rayN(`10808`) → Clash(`7890`/`7891`) → sing-box(`7897`) 顺序扫描，以第一个监听端口为准；均未监听时回退到 `10808`
 
-这匹配 v2rayN 常见的 mixed/http 端口配置。端口不同可以在 slash command 后面传参数覆盖。
+端口不同或需要固定端口时，可在 slash command 后面传参数覆盖，例如 `--http-port 7890 --socks-port 7891`。
 
 ## 代理变量说明
 
