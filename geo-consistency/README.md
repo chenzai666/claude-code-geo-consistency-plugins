@@ -13,7 +13,7 @@
 ```text
 /geo-consistency:geo-status
 /geo-consistency:geo-verify
-/geo-consistency:geo-launch
+/geo-consistency:geo-profile
 ```
 
 参数会原样传给对应平台脚本：
@@ -45,19 +45,19 @@ macOS 上也可以使用 macOS 脚本参数：
 在当前 Claude Code 里可以运行：
 
 ```text
-/geo-consistency:geo-launch
+/geo-consistency:geo-profile
 ```
 
 这只会打印下一次启动应注入的画像。要真正让 Claude Code 使用匹配的时区和语言环境，需要从外部终端启动：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency\scripts\windows\geo-launch.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency\scripts\windows\geo-profile.ps1
 ```
 
 macOS：
 
 ```bash
-bash ./geo-consistency/scripts/macos/geo-launch.sh
+bash ./geo-consistency/scripts/macos/geo-profile.sh
 ```
 
 launcher 会注入 `TZ`、`LANG`、`LC_ALL`、`LC_MESSAGES`、`LANGUAGE`、`ACCEPT_LANGUAGE` 和代理变量，只影响这次启动的 Claude Code 子进程，不写入用户级环境变量。

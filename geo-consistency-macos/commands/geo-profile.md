@@ -1,5 +1,5 @@
 ---
-description: 生成与当前代理出口 IP 一致的 macOS Claude Code 启动画像，包括 TZ、locale 和代理环境变量
+description: 查询当前代理出口 IP 的地理画像（TZ、locale、代理环境变量），不启动新的 Claude Code 会话
 allowed-tools:
   - Bash(powershell.exe:*)
   - Bash(pwsh:*)
@@ -12,7 +12,7 @@ Generate the launch profile for macOS Claude Code geo consistency. This command 
 Final response contract: paste the command stdout exactly as the answer. Do not summarize it, do not convert it to bullets, and do not add an intro sentence.
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/geo-launch.sh" --print-only $ARGUMENTS
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/geo-profile.sh" --print-only $ARGUMENTS
 ```
 
 If `${CLAUDE_PLUGIN_ROOT}` is empty in this Claude Code version, ask the user where the `geo-consistency-macos` plugin is installed, then run the script from that plugin directory.

@@ -46,7 +46,7 @@
 ```text
 /geo-consistency:geo-status
 /geo-consistency:geo-verify
-/geo-consistency:geo-launch
+/geo-consistency:geo-profile
 ```
 
 `geo-status` 默认只看本地配置和进程环境，不做外部出口请求；如需把出口 trace 加到 status 里，Windows 传 `-IncludeNetwork`，macOS 传 `--include-network`。`geo-verify` 才会做直连、终端默认路由、显式代理、Claude/Anthropic trace 的一致性对比，并以表格输出结论。
@@ -56,13 +56,13 @@
 ```text
 /geo-consistency-windows:geo-status
 /geo-consistency-windows:geo-verify
-/geo-consistency-windows:geo-launch
+/geo-consistency-windows:geo-profile
 ```
 
 ```text
 /geo-consistency-macos:geo-status
 /geo-consistency-macos:geo-verify
-/geo-consistency-macos:geo-launch
+/geo-consistency-macos:geo-profile
 ```
 
 `geo-fix` 已移除。Claude Code 插件运行在已经启动的 Claude Code 进程下面，不能反向修改父进程环境；继续保留“修复当前会话”的命令会误导使用。代理环境请先用 `proxy-setup` 或你自己的 shell 配置准备好，再从这个终端启动 Claude Code。
@@ -90,24 +90,24 @@
 
 如果出口是 `US / America/Chicago / en-US`，但 Claude Code 运行时仍是 `Asia/Shanghai / zh-CN`，`geo-verify` 会给出 WARN。
 
-在 Claude Code 内可以运行：
+在 Claude Code 内可以运行 `geo-profile` 查询当前代理出口的地理画像：
 
 ```text
-/geo-consistency:geo-launch
+/geo-consistency:geo-profile
 ```
 
-这个命令只生成启动画像，不会在当前会话里启动嵌套 Claude Code。要让时区和语言真正生效，请从外部终端用 launcher 启动新的 Claude Code：
+命令输出出口 IP、国家、时区、locale 以及会注入的代理环境变量，供参考用；它不启动嵌套 Claude Code。要让时区和语言真正生效，请从外部终端用 launcher 启动新的 Claude Code：
 
 ```powershell
 cd D:\codex-demo\claude-code-geo-consistency-plugins
-powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency\scripts\windows\geo-launch.ps1 -c
+powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency\scripts\windows\geo-profile.ps1 -c
 ```
 
 macOS：
 
 ```bash
 cd /path/to/claude-code-geo-consistency-plugins
-bash ./geo-consistency/scripts/macos/geo-launch.sh
+bash ./geo-consistency/scripts/macos/geo-profile.sh
 ```
 
 launcher 会先按代理出口 IP 查询地理画像，再给子进程注入 `TZ`、`LANG`、`LC_ALL`、`LC_MESSAGES`、`LANGUAGE`、`ACCEPT_LANGUAGE` 以及代理变量，最后启动 `claude`。它不写入用户级环境变量，也不修改系统区域设置。
