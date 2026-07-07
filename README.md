@@ -46,6 +46,7 @@
 ```text
 /geo-consistency:geo-status
 /geo-consistency:geo-verify
+/geo-consistency:geo-launch
 ```
 
 `geo-status` 默认只看本地配置和进程环境，不做外部出口请求；如需把出口 trace 加到 status 里，Windows 传 `-IncludeNetwork`，macOS 传 `--include-network`。`geo-verify` 才会做直连、终端默认路由、显式代理、Claude/Anthropic trace 的一致性对比，并以表格输出结论。
@@ -55,11 +56,13 @@
 ```text
 /geo-consistency-windows:geo-status
 /geo-consistency-windows:geo-verify
+/geo-consistency-windows:geo-launch
 ```
 
 ```text
 /geo-consistency-macos:geo-status
 /geo-consistency-macos:geo-verify
+/geo-consistency-macos:geo-launch
 ```
 
 `geo-fix` 已移除。Claude Code 插件运行在已经启动的 Claude Code 进程下面，不能反向修改父进程环境；继续保留“修复当前会话”的命令会误导使用。代理环境请先用 `proxy-setup` 或你自己的 shell 配置准备好，再从这个终端启动 Claude Code。
@@ -71,6 +74,46 @@
 - SOCKS 代理端口：`10808`
 
 这匹配 v2rayN 常见的 mixed/http 端口配置。端口不同可以在 slash command 后面传参数覆盖。
+
+## 代理变量说明
+
+`HTTP_PROXY` / `HTTPS_PROXY` 是按协议指定的代理变量，`ALL_PROXY` 是兜底变量。若当前 Claude Code 进程没有 `HTTP_PROXY` / `HTTPS_PROXY`，但有 `ALL_PROXY=socks5://127.0.0.1:10808`，curl 仍会通过 SOCKS 代理访问 HTTP/HTTPS 目标。v2rayN 的 `10808` 常见是 mixed port，因此同一个端口可以同时接受 `http://` 和 `socks5://` 代理写法。
+
+`geo-verify` 里的 `terminalHttpProxyCovered` / `terminalHttpsProxyCovered` 会把 `ALL_PROXY` fallback 计算进去；只要它们为 `True`，就表示 HTTP/HTTPS 出口已有代理覆盖。
+
+## 时区和语言画像一致
+
+`geo-verify` 现在会检测显式代理出口 IP 的画像，并和当前 Claude Code 运行时画像对比：
+
+- 出口画像：IP、国家码、城市/地区/国家、经纬度、ISP、IANA timezone。
+- 本地运行时：`TZ`、Node/Intl 当前 timezone、系统 timezone、`LANG`、`LC_ALL`、`LC_MESSAGES`、`LANGUAGE`。
+- 推断 bundle：`language`、`languages`、`acceptLanguage`、`posixLocale`、`timezone`。
+
+如果出口是 `US / America/Chicago / en-US`，但 Claude Code 运行时仍是 `Asia/Shanghai / zh-CN`，`geo-verify` 会给出 WARN。
+
+在 Claude Code 内可以运行：
+
+```text
+/geo-consistency:geo-launch
+```
+
+这个命令只生成启动画像，不会在当前会话里启动嵌套 Claude Code。要让时区和语言真正生效，请从外部终端用 launcher 启动新的 Claude Code：
+
+```powershell
+cd D:\codex-demo\claude-code-geo-consistency-plugins
+powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency\scripts\windows\geo-launch.ps1
+```
+
+macOS：
+
+```bash
+cd /path/to/claude-code-geo-consistency-plugins
+bash ./geo-consistency/scripts/macos/geo-launch.sh
+```
+
+launcher 会先按代理出口 IP 查询地理画像，再给子进程注入 `TZ`、`LANG`、`LC_ALL`、`LC_MESSAGES`、`LANGUAGE`、`ACCEPT_LANGUAGE` 以及代理变量，最后启动 `claude`。它不写入用户级环境变量，也不修改系统区域设置。
+
+注意：`TZ` 对 Node/Claude Code 的默认 timezone 通常生效；语言会按出口 IP 注入到 `LANG`、`LC_ALL`、`LANGUAGE`、`ACCEPT_LANGUAGE`。但 Windows 上 Node/Bun 的默认 `Intl` locale 往往来自系统区域设置，`LANG/LC_ALL` 不一定能把 `Intl.DateTimeFormat().resolvedOptions().locale` 从 `zh-CN` 改成 `en-US`。插件会保证子进程语言环境变量和时区一致，并在 `verify` 表格里单独显示 `languageEnvMatchesExit` 与 `nodeLocaleMatchesExit`。
 
 ## Claude Code 卸载
 
@@ -156,5 +199,5 @@ Remove-Item -Recurse -Force ".\claude-desktop-geo-consistency\dist" -ErrorAction
 - 无账号系统。
 - 不读取网页内容。
 - 不读取 Claude 聊天内容。
-- 外部请求只用于出口检测：`api.anthropic.com/cdn-cgi/trace`、`claude.ai/cdn-cgi/trace`、`cloudflare.com/cdn-cgi/trace`。
+- 外部请求只用于出口检测和出口画像匹配：`api.anthropic.com/cdn-cgi/trace`、`claude.ai/cdn-cgi/trace`、`cloudflare.com/cdn-cgi/trace`、`ipapi.co/json`、`ipinfo.io/json`、`ipwho.is`。
 - Claude Code 插件只读取当前进程环境变量、系统代理摘要、本地端口状态、npm/git 代理配置和出口 trace。

@@ -1,7 +1,7 @@
 {
   "name": "geo-consistency",
-  "version": "0.1.3",
-  "description": "统一版 Claude Code 代理、出口 IP 和运行时环境一致性检查，自动适配 Windows/macOS。",
+  "version": "0.1.5",
+  "description": "统一版 Claude Code 代理、出口 IP、时区和语言环境一致性检查，自动适配 Windows/macOS。",
   "author": {
     "name": "local"
   },

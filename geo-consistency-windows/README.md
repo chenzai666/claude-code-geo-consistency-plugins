@@ -22,6 +22,7 @@
 ```text
 /geo-consistency-windows:geo-status
 /geo-consistency-windows:geo-verify
+/geo-consistency-windows:geo-launch
 ```
 
 可以在命令后传参数覆盖默认端口，例如：
@@ -62,3 +63,21 @@ claude plugin marketplace remove geo-consistency --scope user
 Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\plugins\cache\geo-consistency" -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\plugins\marketplaces\geo-consistency" -ErrorAction SilentlyContinue
 ```
+
+## 时区和语言画像一致
+
+`geo-verify` 会查询显式代理出口 IP 的地理画像，并对比当前 Claude Code 运行时的 `TZ`、Node timezone、系统 timezone、`LANG`、`LC_ALL`、`LC_MESSAGES`、`LANGUAGE`。如果出口 IP 是 `US / America/Chicago / en-US`，但当前运行时仍是 `Asia/Shanghai / zh-CN`，结果会显示 WARN。
+
+在 Claude Code 内运行：
+
+```text
+/geo-consistency-windows:geo-launch
+```
+
+这个命令只打印下一次启动应注入的画像。要真正生效，请从外部 PowerShell 启动新的 Claude Code：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\geo-consistency-windows\scripts\geo-launch.ps1
+```
+
+launcher 只影响这次启动的子进程，不写入用户级环境变量，不修改 Windows 系统区域设置。Windows 上 `TZ` 通常能影响 Node/Claude Code timezone；语言会按出口 IP 注入到 `LANG`、`LC_ALL`、`LANGUAGE`、`ACCEPT_LANGUAGE`。但 Windows 上 Node/Bun 的默认 `Intl` locale 常来自系统区域设置，`LANG/LC_ALL` 不一定能改掉，`geo-verify` 会单独显示 `languageEnvMatchesExit` 和 `nodeLocaleMatchesExit`。

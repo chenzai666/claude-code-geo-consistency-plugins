@@ -29,6 +29,11 @@ fi
 geo_section "Process Environment"
 geo_print_env
 
+geo_section "Runtime Profile"
+geo_runtime_profile | while IFS='=' read -r key value; do
+  geo_kv "$key" "$value"
+done
+
 geo_section "macOS System Proxy"
 if command -v scutil >/dev/null 2>&1; then
   scutil --proxy
@@ -40,6 +45,22 @@ geo_section "Tool Proxy Config"
 geo_print_tool_config
 
 if [ "$GEO_SKIP_NETWORK" != "1" ]; then
+  EXIT_PROFILE="$(geo_ip_profile "$HTTP_PROXY_URL" "$GEO_IPINFO_TOKEN")"
+  EXIT_COUNTRY="$(printf '%s\n' "$EXIT_PROFILE" | geo_profile_value countryCode)"
+  EXIT_TIMEZONE="$(printf '%s\n' "$EXIT_PROFILE" | geo_profile_value timezone)"
+  LOCALE_BUNDLE="$(geo_locale_bundle "$EXIT_COUNTRY" "$EXIT_TIMEZONE")"
+
+  geo_section "Exit IP Profile"
+  for key in provider ip countryCode country region city latitude longitude isp timezone error; do
+    value="$(printf '%s\n' "$EXIT_PROFILE" | geo_profile_value "$key")"
+    [ -n "$value" ] && geo_kv "$key" "$value"
+  done
+
+  geo_section "Inferred Locale Bundle"
+  printf '%s\n' "$LOCALE_BUNDLE" | while IFS='=' read -r key value; do
+    geo_kv "$key" "$value"
+  done
+
   geo_section "Egress Traces"
   geo_trace "env-default" "https://api.anthropic.com/cdn-cgi/trace"
   printf '\n'
